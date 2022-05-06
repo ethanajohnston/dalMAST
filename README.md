@@ -50,16 +50,29 @@ How this works and how to add tasks and how the kernal works.
 ## Uploading Waypoints:
 
 Creating KML waypoints file from Google Earth:
-1. 
-2. 
-3. 
+1. Click the placemark icon on the bottom left and then select a place on the map.
+2. Select new project on the window that shows up and add in the project title, then click ok.
+3. Fill out the name and description of the placemark in the window that shows up. This is auto saved.
+4. Repeat the above steps for any additional placemarks you want to add, but instead of new project, save to your
+   existing project.
+5. Click the menu option (3 lines) on the top left and then select your project by right-clicking.
+6. Click the 3 dots on the top right of the new window, and select export as KML file. This is the waypoints file.
+
+
 
 
 Uploading to EEPROM using Processing KML Uploader script
 1. [Download Processing](https://processing.org/download)
-2. Place .kml in the same directory as the processing script.  
-3. Run [script]() with 
-4.
+2. Place .kml in the same directory as the processing script. Rename the .kml file to OUTPUT.kml.  
+3. Connect computer to the main board (big boy) and the XBee V3 USB radio transmitter.
+4. Upload the most up to date software on main board. (If it is already on there, dont worry about it)
+5. Open Putty. Enter the above port for the main board and the serial number as 57600, then proceed. This will allow you to verify
+   that the waypoints are being uploaded properly.
+6. Open the KML_TO_WAYPOINT_UPLOADER.pde processing script.
+7. Change the port name at the top to the port name you obtained from the device manager.
+8. Ensure that in the function parseKML, the loadStrings function is reading the file OUTPUT.kml.
+9. Run the processing script with the play button.
+10. That's it. You can see the functioning in the Putty window.
 
 ## Function Map Diagram
 
