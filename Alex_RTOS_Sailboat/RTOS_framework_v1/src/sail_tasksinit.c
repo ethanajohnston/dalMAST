@@ -47,7 +47,7 @@ enum status_code init_tasks(void) {
 	
 	// Task for reading incoming data from the weather station
 	//xTaskCreate( ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
-	
+	#if beacon
 	// Task for updating the course of the sailboat
 	xTaskCreate( UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, NULL );
 	
@@ -62,6 +62,10 @@ enum status_code init_tasks(void) {
 	
 	// Task for getting the heading from the compass
 	//xTaskCreate( ReadCompass, NULL, READ_COMPASS_STACK_SIZE, NULL, READ_COMPASS_PRIORITY, NULL );
+	#endif
+	// ** Create a task for the beacon a.k.a data logger
+	
+	
 	
 	// Task for reseting the watchdog so that the microcontroller is not restarted
 	xTaskCreate( WatchDogTask, NULL, WATCHDOG_STACK_SIZE, NULL, WATCHDOG_PRIORITY, NULL );

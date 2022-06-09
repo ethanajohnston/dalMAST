@@ -6,7 +6,7 @@
 
 #ifndef SAIL_TASKSINIT_H
 #define SAIL_TASKSINIT_H
-
+#define beacon
 
 #include "FreeRTOS.h"
 #include "event_groups.h"

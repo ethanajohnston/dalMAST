@@ -1,8 +1,8 @@
 /* main.c
  * Main function for the sailboat.
  * Initializes the system and then starts the freeRTOS tasks
- * Created on 
- * Created by
+ * 
+ * 
  */
 
 #include "sail_ctrl.h"
@@ -12,7 +12,9 @@
 int main(void)
 {
 	CTRL_InitSystem(); // Init -> DEBUG UART, RADIO, EERPROM
+	#if beacon
 	CTRL_InitSensors(); // Initialize the WeatherStation
 	startup(); //Enable WS - Init Motors - Get the first waypoint
+	#endif
 	init_tasks();
 }
