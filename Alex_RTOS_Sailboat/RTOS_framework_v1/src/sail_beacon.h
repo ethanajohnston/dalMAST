@@ -6,8 +6,14 @@
  */ 
 // sail boat libraries 
 #include "status_codes.h"
+// beacon types and defs
 
-// 
+enum beacon_msg_type{
+	beacon_AT_msg,
+	beacon_ERROR_msg,
+	beacon_msg_type_total
+};
+
 // Function Prototypes 
 void DataLogTask(void);
 enum status_code beacon_status(void);

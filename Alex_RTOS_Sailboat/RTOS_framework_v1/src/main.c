@@ -12,7 +12,7 @@
 int main(void)
 {
 	CTRL_InitSystem(); // Init -> DEBUG UART, RADIO, EERPROM
-	#if beacon
+	#if 0
 	CTRL_InitSensors(); // Initialize the WeatherStation
 	startup(); //Enable WS - Init Motors - Get the first waypoint
 	#endif

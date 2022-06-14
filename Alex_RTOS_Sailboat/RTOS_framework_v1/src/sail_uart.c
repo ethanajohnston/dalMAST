@@ -39,10 +39,11 @@ static struct usart_module uart_modules[UART_NUM_CHANNELS];
 
 
 static uint32_t baud_rates[] = {
-	9600,
+	19200,
 	4800,
 	9600,
-	57600
+	57600,
+	19200
 };
 
 /*
@@ -54,27 +55,28 @@ UART_ChannelIDs:
 	UART_NUM_CHANNELS
 */
 
-
-
 static enum usart_signal_mux_settings mux_settings[] = {
 	USART_RX_1_TX_0_XCK_1,
 	USART_RX_1_TX_0_XCK_1,
 	USART_RX_1_TX_0_XCK_1,
-	USART_RX_3_TX_2_XCK_3
+	USART_RX_3_TX_2_XCK_3,
+	USART_RX_1_TX_0_XCK_1
 };
 
 static uint32_t pinmux_pads[][UART_NUM_CHANNELS] = {
 	{PINMUX_PA04D_SERCOM0_PAD0, PINMUX_PA05D_SERCOM0_PAD1, PINMUX_UNUSED, PINMUX_UNUSED},
 	{PINMUX_PB08D_SERCOM4_PAD0, PINMUX_PB09D_SERCOM4_PAD1, PINMUX_UNUSED, PINMUX_UNUSED},
 	{PINMUX_PB16C_SERCOM5_PAD0, PINMUX_PB17C_SERCOM5_PAD1, PINMUX_UNUSED, PINMUX_UNUSED},
-	{PINMUX_UNUSED, PINMUX_UNUSED, PINMUX_PA24C_SERCOM3_PAD2, PINMUX_PA25C_SERCOM3_PAD3}
+	{PINMUX_UNUSED, PINMUX_UNUSED, PINMUX_PA24C_SERCOM3_PAD2, PINMUX_PA25C_SERCOM3_PAD3},
+	{PINMUX_PA16C_SERCOM1_PAD0, PINMUX_PA17C_SERCOM1_PAD1,PINMUX_UNUSED,PINMUX_UNUSED}	
 };
 
 static Sercom *const sercom_ptrs[] = {
 	SERCOM0,
 	SERCOM4,
 	SERCOM5,
-	SERCOM3
+	SERCOM3,
+	SERCOM1
 };
 
 // Receiver states
@@ -116,7 +118,8 @@ static void RADIO_RxCallback(struct usart_module *const usart_module);
 static void RADIO_TxCallback(struct usart_module *const usart_module);
 static void XEOS_RxCallback(struct usart_module *const usart_module);
 static void XEOS_TxCallback(struct usart_module *const usart_module);
-
+static void BEACON_RxCallback(struct usart_module * const usart_module);
+static void BEACON_TxCallback(struct usart_module * const usart_module);
 // Generic callback
 static void UART_RxCallback(UART_ChannelID id);
 static void UART_TxCallback(UART_ChannelID id);
@@ -126,7 +129,8 @@ static usart_callback_t RxCallbacks[] = {
 	GPS_RxCallback,
 	WIND_RxCallback,
 	RADIO_RxCallback,
-	XEOS_RxCallback
+	XEOS_RxCallback,
+	BEACON_RxCallback
 };
 
 // Callback pointer array
@@ -134,7 +138,8 @@ static usart_callback_t TxCallbacks[] = {
 	GPS_TxCallback,
 	WIND_TxCallback,
 	RADIO_TxCallback,
-	XEOS_TxCallback
+	XEOS_TxCallback,
+	BEACON_TxCallback
 };
 
 
@@ -338,6 +343,9 @@ void XEOS_RxCallback(struct usart_module *const usart_module) {
 	UART_RxCallback(UART_XEOS);
 }
 
+void BEACON_RxCallback(struct usart_module * const usart_module){
+	UART_RxCallback(UART_BEACON);
+}
 // **** Transmit callbacks ******************************************************************
 
 void GPS_TxCallback(struct usart_module *const usart_module) {
@@ -354,6 +362,10 @@ void RADIO_TxCallback(struct usart_module *const usart_module) {
 
 void XEOS_TxCallback(struct usart_module *const usart_module) {
 	UART_TxCallback(UART_XEOS);
+}
+
+void BEACON_TxCallback(struct usart_module * const usrat_module){
+	UART_TxCallback(UART_BEACON);
 }
 
 // **** Generic callbacks ******************************************************************

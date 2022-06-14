@@ -18,6 +18,7 @@
 #include "sail_nav.h"
 #include "sail_ctrl.h"
 #include "sail_radio.h"
+#include "sail_beacon.h"
 
 void WatchDogTask(void);
 static void StartWatchDog(void);
@@ -47,7 +48,7 @@ enum status_code init_tasks(void) {
 	
 	// Task for reading incoming data from the weather station
 	//xTaskCreate( ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
-	#if beacon
+	#if 0
 	// Task for updating the course of the sailboat
 	xTaskCreate( UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, NULL );
 	
@@ -64,15 +65,13 @@ enum status_code init_tasks(void) {
 	//xTaskCreate( ReadCompass, NULL, READ_COMPASS_STACK_SIZE, NULL, READ_COMPASS_PRIORITY, NULL );
 	#endif
 	// ** Create a task for the beacon a.k.a data logger
-	
-	
+	xTaskCreate(DataLogTask, NULL,LOG_DATA_STACK_SIZE, NULL,LOG_DATA_PRIORITY, NULL);
 	
 	// Task for reseting the watchdog so that the microcontroller is not restarted
 	xTaskCreate( WatchDogTask, NULL, WATCHDOG_STACK_SIZE, NULL, WATCHDOG_PRIORITY, NULL );
 	
 	//pass control to FreeRTOS kernel
 	vTaskStartScheduler();
-	
 	
 	// The program should not reach this point
 	// If it does, more freeRTOS heap memory must be allocated
@@ -116,7 +115,6 @@ static void StartWatchDog(void)
 	wdt_set_config(&config_wdt);
 }
 
-
 static void KickWatchDog(void)
 {
 	wdt_reset_count();
@@ -130,5 +128,3 @@ void vApplicationDaemonTaskStartupHook(void) {
 	// Start the watchdog timer
 	//StartWatchDog();
 }
-
-
