@@ -71,13 +71,7 @@ void DataLogTask(void){
 		running_task = eLogData;
 		
 		rc = beacon_status();
-		
-		//switch(rc){
-		
-		
-			
-			
-		//}
+
 		
 		vTaskDelay(beacon_task_delay);
 	}
@@ -90,30 +84,41 @@ accordingly
 */
 enum status_code beacon_status(void){
 	
-	char msgtx[3] = "AT\n";
-	static char msgrx[200];
-	
-	for ( int i = 0; i <200;++i){
-		msgrx[i] = NULL;
-	}
+	char msgtx[] = "AT\n";
+	static char msgrx[reply_error_length];
 	enum status_code rc;
-	DEBUG_Write_Unprotected("%s\n\r",msgtx);
 	
+	DEBUG_Write_Unprotected("%s\n\r",msgtx);
 	rc = UART_TxString(UART_BEACON,&msgtx);
 	
 	switch (rc){
-		
 		case STATUS_OK:
 			DEBUG_Write_Unprotected("STATUS OK\n\r");
 			break;
+		case STATUS_ERR_INVALID_ARG:
+			DEBUG_Write_Unprotected("Invalid UART Channel\n\r");
+			break;
+		case STATUS_ERR_BAD_ADDRESS:
+			DEBUG_Write_Unprotected("Null Pointer Sent\n\r")	
 		default:
-			DEBUG_Write_Unprotected("ERROR\n\r");	
+			DEBUG_Write_Unprotected("ERROR Unhandled\n\r");	
 			break;
 	}
+	
 	rc = UART_RxString(UART_BEACON,( uint8_t *)msgrx, beacon_msg_length[beacon_AT_msg]);
 	
-	DEBUG_Write("%s\n\r",msgrx);
-	DEBUG_Write("%d\n\r %d\n\r", rc, STATUS_ERR_NO_MEMORY);
+	switch (rc){
+		case STATUS_VALID_DATA:
+			DEBUG_Write_Unprotected("%s \n\r");
+			break;
+		case STATUS_NO_CHANGE:
+			DEBUG_Write_Unprotected("No new data in buffer\n\r");
+			break;
+		case STATUS_ERR_INVALID_ARG:
+			DEBUG_Write_Unprotected("Invalid UART Channel\n\r");		
+	}
+	DEBUG_Write_Unprotected("%s\n\r",msgrx);
+	DEBUG_Write_Unprotected("%d\n\r %d\n\r", rc, STATUS_ERR_NO_MEMORY);
 	return STATUS_OK;
 	
 };
