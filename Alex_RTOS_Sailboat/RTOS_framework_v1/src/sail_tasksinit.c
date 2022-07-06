@@ -14,6 +14,7 @@
 #include "usart_interrupt.h"
 #include "sail_nmea.h"
 #include "Sail_WEATHERSTATION.h"
+#include "sail_gps.h"
 #include "sail_types.h"
 #include "sail_nav.h"
 #include "sail_ctrl.h"
@@ -45,6 +46,9 @@ enum status_code init_tasks(void) {
 	// Initialize the watchdog counter
 	watchdog_counter = 0;
 	
+	// Task for reading incoming data from the GPS
+	xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
+
 	// Task for reading incoming data from the weather station
 	//xTaskCreate( ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
 	
