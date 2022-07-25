@@ -1,8 +1,30 @@
+/*                           *******************
+******************************* C SOURCE FILE *******************************
+**                           *******************                           **
+**                                                                         **
+** filename  : sail_math.c                                                 **
+** author    : DalMAST Team                                                **
+** created   : 2016-08-16                                                  **
+**                                                                         **
+*****************************************************************************
 
-#include "sail_math.h"
+Implementation of the Mathematical Operations used to support our control 
+algorithms 
 
+/***************************************************************************/
+/**                                                                       **/
+/**                     MODULES USED                                      **/
+/**                                                                       **/
+/***************************************************************************/
+/* Standard Headers */
 #include <math.h>
-
+/* Sail Headers */
+#include "sail_math.h"
+/***************************************************************************/
+/**                                                                       **/
+/**                     EXPORTED FUNCTIONS                                **/
+/**                                                                       **/
+/***************************************************************************/
 // Clamp the input between the high and low thresholds
 double MATH_Clamp(double val, double low, double high)
 {
@@ -17,8 +39,7 @@ double MATH_Clamp(double val, double low, double high)
 		return val;
 	}
 }
-
-
+/***************************************************************************/
 // Map val from one range to another via linear interpolation
 double MATH_Map(double val, double in_low, double in_high, double out_low, double out_high)
 {
@@ -38,7 +59,7 @@ double MATH_Map(double val, double in_low, double in_high, double out_low, doubl
 	
 	return output;
 }
-
+/***************************************************************************/
 // Force the angle into range (-180, 180]
 float MATH_ForceAngleTo180(double angle)
 {
@@ -52,8 +73,7 @@ float MATH_ForceAngleTo180(double angle)
 	
 	return angle;
 }
-
-
+/***************************************************************************/
 // Force the angle into range [0, 360)
 float MATH_ForceAngleTo360(double angle)
 {
@@ -65,3 +85,8 @@ float MATH_ForceAngleTo360(double angle)
 	
 	return angle;
 }
+/***************************************************************************/
+/**                                                                       **/
+/**                               EOF                                     **/
+/**                                                                       **/
+/***************************************************************************/

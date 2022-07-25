@@ -1,8 +1,22 @@
 
 #ifndef SAIL_MATH_H_
 #define SAIL_MATH_H_
-
-
+/*                           *******************
+******************************* C Library FILE ******************************
+**                           *******************                           **
+**                                                                         **
+** filename  : sail_math.h                                                 **
+** author    : DalMAST Team                                                **
+** created   : 2016-08-16                                                  **
+**                                                                         **
+*****************************************************************************
+This file contains the definitions of the mathematical operations used to 
+support our control algorithms
+/***************************************************************************/
+/**                                                                       **/
+/**                     PROTOTYPES OF EXPORTED FUNCTIONS                  **/
+/**                                                                       **/
+/***************************************************************************/
 /* MATH_Clamp
  * Clamp the input between the high and low thresholds
  * Input:
@@ -49,3 +63,8 @@ float MATH_ForceAngleTo180(double angle);
 float MATH_ForceAngleTo360(double angle);
 
 #endif /* SAIL_MATH_H_ */
+/***************************************************************************/
+/**                                                                       **/
+/**                               EOF                                     **/
+/**                                                                       **/
+/***************************************************************************/

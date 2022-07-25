@@ -1,31 +1,51 @@
-/* sail_adc.c
- * Implementation of the ADC driver module for the autonomous sailboat project.
- * Created on August 11, 2016.
- * Created by Thoms Gwynne-Timothy & Julia Sarty.
- */
+/*                           *******************
+******************************* C SOURCE FILE *******************************
+**                           *******************                           **
+**                                                                         **
+** filename  : sail_adc.c                                                  **
+** author    : Thomas Gwynne-Timothy & Julia Sarty.                        **
+** created   : 2016-08-11                                                  **
+**                                                                         **
+*****************************************************************************
 
-#include "sail_adc.h"
+Implementation of the ADC driver module for the autonomous sailboat project.
 
+/***************************************************************************/
+/**                                                                       **/
+/**                     MODULES USED                                      **/
+/**                                                                       **/
+/***************************************************************************/
+/* Standard Headers */
 #include <asf.h>
 #include <stdbool.h>
 #include <inttypes.h>
-
+/* Sail Headers */
+#include "sail_adc.h"
 #include "sail_math.h"
-#include "sail_debug.h"
 
-// ADC instance
-static struct adc_module adc;
-
+/***************************************************************************/
+/**                                                                       **/
+/**                     GLOBAL VARIABLES                                  **/
+/**                                                                       **/
+/***************************************************************************/
 // ADC pin mappings
 static const enum adc_positive_input input_pins[ADC_NUM_CHANNELS] = {
 	ADC_POSITIVE_INPUT_PIN0,
 	ADC_POSITIVE_INPUT_PIN1
 };
+// ADC instance
+static struct adc_module adc;
 
 // Flag to indicate the module has been initialized
 static bool init_flag = false;
 
-enum status_code ADC_Init(void) {
+/***************************************************************************/
+/**                                                                       **/
+/**                     EXPORTED FUNCTIONS                                **/
+/**                                                                       **/
+/***************************************************************************/
+enum status_code ADC_Init(void) 
+{
 	struct adc_config config_adc;
 
 	adc_get_config_defaults(&config_adc);
@@ -46,6 +66,7 @@ enum status_code ADC_Init(void) {
 	return STATUS_OK;
 }
 
+/***************************************************************************/
 enum status_code ADC_GetReading(ADC_ChannelID id, double *reading)
 {
 	// Return if the module hasn't been initialized yet
@@ -80,5 +101,8 @@ enum status_code ADC_GetReading(ADC_ChannelID id, double *reading)
 	
 	return STATUS_OK;
 }
-
-	
+/***************************************************************************/
+/**                                                                       **/
+/**                               EOF                                     **/
+/**                                                                       **/
+/***************************************************************************/	

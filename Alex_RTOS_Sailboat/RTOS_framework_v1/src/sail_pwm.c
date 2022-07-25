@@ -1,21 +1,44 @@
-/* sail_pwm.c
- * Implementation of the PWM driver module for the autonomous sailboat project.
- * Created on Thomas Gwynne-Timothy.
- * Created by August 16, 2016.
- */
+/*                           *******************
+******************************* C SOURCE FILE *******************************
+**                           *******************                           **
+**                                                                         **
+** filename  : sail_pwm.c                                                  **
+** author    : Thomas Gwynne-Timothy                                       **
+** created   : 2016-08-16                                                  **
+**                                                                         **
+*****************************************************************************
 
+Implementation of the PWM driver module for the autonomous sailboat project.
+ 
+/***************************************************************************/
+/**                                                                       **/
+/**                     MODULES USED                                      **/
+/**                                                                       **/
+/***************************************************************************/
 #include "sail_pwm.h"
 #include "sail_debug.h"
-
-//only 2 outputs of this software therefore ony 2 pins
+/***************************************************************************/
+/**                                                                       **/
+/**                     DEFINITIONS AND MACROS                            **/
+/**                                                                       **/
+/***************************************************************************/
+//only 2 outputs of this software therefore only 2 pins
 #define PWM_MODULE				TC4
 #define PWM_SAIL_OUT_PIN		PIN_PB13E_TC4_WO1
 #define PWM_SAIL_OUT_MUX		MUX_PB13E_TC4_WO1
 #define PWM_RUDDER_OUT_PIN		PIN_PB12E_TC4_WO0
 #define PWM_RUDDER_OUT_MUX		MUX_PB12E_TC4_WO0
-
+/***************************************************************************/
+/**                                                                       **/
+/**                     GLOBAL VARIABLES                                  **/
+/**                                                                       **/
+/***************************************************************************/
 static struct tc_module pwm_timer;
-
+/***************************************************************************/
+/**                                                                       **/
+/**                     EXPORTED FUNCTIONS                                **/
+/**                                                                       **/
+/***************************************************************************/
 enum status_code PWM_Init(void)
 {
 	// Get the default configuration
@@ -47,19 +70,21 @@ enum status_code PWM_Init(void)
 
 	return STATUS_OK;
 }
-
-
+/***************************************************************************/
 enum status_code PWM_SetDuty(PWM_ChannelID id, uint8_t duty)
 {
 	tc_set_compare_value(&pwm_timer, id, duty);	
 	return STATUS_OK;
 }
-
-
+/***************************************************************************/
 enum status_code PWM_Disable(PWM_ChannelID id)
 {
 	tc_set_compare_value(&pwm_timer, id, 0);	
 	return STATUS_OK;
 }
-
+/***************************************************************************/
+/**                                                                       **/
+/**                               EOF                                     **/
+/**                                                                       **/
+/***************************************************************************/
 
