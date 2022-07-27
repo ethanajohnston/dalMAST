@@ -38,6 +38,8 @@ src\sail_tasksinit.c
 
 src\sail_uart.c
 
+src\Sail_WEATHERSTATION.c
+
 src\sail_wind.c
 
 src\ASF\sam0\drivers\sercom\i2c\i2c_samd20\i2c_master.c

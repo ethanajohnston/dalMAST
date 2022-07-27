@@ -10,7 +10,7 @@
 **                                                                         **
 *****************************************************************************
 
-This C Library file is the implementation of Nauton's Linear Actuator Driver
+This C Library file is the implementation of Nautono's Linear Actuator Driver
  
 /***************************************************************************/
 /**                                                                       **/
@@ -18,22 +18,27 @@ This C Library file is the implementation of Nauton's Linear Actuator Driver
 /**                                                                       **/
 /***************************************************************************/
 #include <asf.h>
+#include <stdbool.h>
 /***************************************************************************/
 /**                                                                       **/
 /**                     DEFINITIONS AND MACROS                            **/
 /**                                                                       **/
 /***************************************************************************/
-
-#define SAIL_POWER_PIN		PIN_PB06
-#define isActuatorON
-#define isActuatorOFF
-#define toggleActuator
+#define NEUTRAL_POS				90.00
+#define DEFAULT_TARGET_POS		0.0
+#define ACTUATOR_PWR_PIN		PIN_PB15
 /***************************************************************************/
 /**                                                                       **/
 /**                     TYPDEFS AND STRUCTURES                            **/
 /**                                                                       **/
 /***************************************************************************/
-
+typedef struct SailActuator
+{
+	bool on;
+	double current_pos;
+	double target_pos;
+	
+} SailActuator_t;
 /***************************************************************************/
 /**                                                                       **/
 /**                     EXPORTED VARIABLES                                **/
@@ -46,7 +51,8 @@ This C Library file is the implementation of Nauton's Linear Actuator Driver
 /**                                                                       **/
 /***************************************************************************/
 enum status_code SetActuatorPos(double position);
-static void SailControlCallback(struct tc_module *const module_inst);
+extern void SailControlCallback(struct tc_module *const module_inst);
+
 
 #endif // SAIL_ACTUATOR_H
 /***************************************************************************/

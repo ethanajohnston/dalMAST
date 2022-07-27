@@ -24,10 +24,9 @@ void WatchDogTask(void);
 static void StartWatchDog(void);
 static void KickWatchDog(void);
 
-enum all_tasks running_task;
-
 EventGroupHandle_t mode_event_group = NULL;
 SemaphoreHandle_t write_buffer_mutex[UART_NUM_CHANNELS];
+TaskHandle_t TaskHandles[TotalTasks];
 
 unsigned char watchdog_counter;
 unsigned char watchdog_reset_value = 0x3F;
@@ -45,38 +44,32 @@ enum status_code init_tasks(void) {
 	
 	// Initialize the watchdog counter
 	watchdog_counter = 0;
-	
-	// Task for reading incoming data from the weather station
-	//xTaskCreate( ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
-	#if 0
+		
 	// Task for updating the course of the sailboat
-	xTaskCreate( UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, NULL );
-	
+
+	xTaskCreate(UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, &TaskHandles[UpdateCourseTask]);
 	// Task for changing the position of the rudder
-	xTaskCreate( ControlRudder, NULL, CONTROL_RUDDER_STACK_SIZE, NULL, CONTROL_RUDDER_PRIORITY, NULL );
-	
+	//xTaskCreate(ControlRudder, NULL, CONTROL_RUDDER_STACK_SIZE, NULL, CONTROL_RUDDER_PRIORITY, &TaskHandles[ControlRudderTask]);
+
+	// Task for changing the position of the sail 
+	//xTaskCreate(ControlSail, NULL, CONTROL_SAIL_STACK_SIZE,NULL,CONTROL_SAIL_PRIORITY,&TaskHandles[ControlSailTask]);
 	// Task for handling incoming messages to the radio
-	xTaskCreate( RadioHandler, NULL, RADIO_HANDLER_STACK_SIZE, NULL, RADIO_HANDLER_PRIORITY, NULL );
-	
+
+	//xTaskCreate( RadioHandler, NULL, RADIO_HANDLER_STACK_SIZE, NULL, RADIO_HANDLER_PRIORITY,&TaskHandles[RadioHandlerTask]);
 	// Task for transmitting logs using the radio
-	xTaskCreate( LogData, NULL, LOG_DATA_STACK_SIZE, NULL, LOG_DATA_PRIORITY, NULL );
-	
+
+	//xTaskCreate( LogData, NULL, LOG_DATA_STACK_SIZE, NULL, LOG_DATA_PRIORITY,&TaskHandles[LogDataTask]);
 	// Task for getting the heading from the compass
 	//xTaskCreate( ReadCompass, NULL, READ_COMPASS_STACK_SIZE, NULL, READ_COMPASS_PRIORITY, NULL );
-	#endif
-	// ** Create a task for the beacon a.k.a data logger
-	xTaskCreate(DataLogTask, NULL,LOG_DATA_STACK_SIZE, NULL,LOG_DATA_PRIORITY, NULL);
-	
+
 	// Task for reseting the watchdog so that the microcontroller is not restarted
-	xTaskCreate( WatchDogTask, NULL, WATCHDOG_STACK_SIZE, NULL, WATCHDOG_PRIORITY, NULL );
-	
+	xTaskCreate( WatchDogTask, NULL, WATCHDOG_STACK_SIZE, NULL, WATCHDOG_PRIORITY, &TaskHandles[eWatchDogTask]);
 	//pass control to FreeRTOS kernel
 	vTaskStartScheduler();
-	
+
 	// The program should not reach this point
 	// If it does, more freeRTOS heap memory must be allocated
-	return STATUS_ERR_INSUFFICIENT_RTOS_HEAP;
-	
+	return STATUS_ERR_INSUFFICIENT_RTOS_HEAP;	
 }
 
 void WatchDogTask(void){
@@ -126,5 +119,5 @@ void vApplicationDaemonTaskStartupHook(void) {
 	watchdog_reset_value = 0x3F;
 	
 	// Start the watchdog timer
-	//StartWatchDog();
+	StartWatchDog();
 }

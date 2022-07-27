@@ -638,7 +638,7 @@ void RadioHandler(void) {
 		TickType_t radio_handler_delay = pdMS_TO_TICKS(RADIO_SLEEP_PERIOD_MS);
 		
 		while (1) {
-			running_task = eRadioHandler;
+			running_task = RadioHandlerTask;
 			RADIO_GenericMsg rx_msg;
 			RADIO_Enable();
 			

@@ -1,18 +1,38 @@
 
 #ifndef SAIL_CTRL_H_
 #define SAIL_CTRL_H_
+/*                           *******************
+******************************* C Library FILE ******************************
+**                           *******************                           **
+**                                                                         **
+** filename  : sail_actuator.h                                             **
+** author    : Matthew Cockburn                                            **
+** created   : 2022-07-23                                                  **
+**                                                                         **
+*****************************************************************************
 
+This C Library file is contains the definitions of Nautono's Task Runner 
+Functions 
+
+/***************************************************************************/
+/**                                                                       **/
+/**                     MODULES USED                                      **/
+/**                                                                       **/
+/***************************************************************************/
+/* Standard Headers */
+#include <asf.h>
+#include <status_codes.h>
+/* Sail Headers */
+#include "sail_radio.h"
 #include "delay.h"
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "task.h"
-
-
-
-#include <asf.h>
-#include <status_codes.h>
-#include "sail_radio.h"
-
+/***************************************************************************/
+/**                                                                       **/
+/**                     DEFINITIONS AND MACROS                            **/
+/**                                                                       **/
+/***************************************************************************/
 #define LOG_DATA_SLEEP_PERIOD_MS 5000
 
 #define UPDATECOURSE_ON_TIME_SEC 2
@@ -23,8 +43,16 @@
 #define CONTROLRUDDER_LOOP_LIM CONTROLRUDDER_ON_TIME_SEC * configTICK_RATE_HZ
 #define CONTROL_RUDDER_SLEEP_PERIOD_MS 1000
 
-#define READ_COMPASS_SLEEP_PERIOD_MS 500
+#define CONTROL_SAIL_ON_TIME_SEC 2
+#define CONTROL_SAIL_LOOP_LIM CONTROL_SAIL_ON_TIME_SEC * configTICK_RATE_HZ
+#define CONTROL_SAIL_SLEEP_PERIOD_MS 1000
 
+#define READ_COMPASS_SLEEP_PERIOD_MS 500
+/***************************************************************************/
+/**                                                                       **/
+/**                     TYPDEFS AND STRUCTURES                            **/
+/**                                                                       **/
+/***************************************************************************/
 typedef enum Sensor_Types {
 	SENSOR_GPS,
 	SENSOR_WIND,
@@ -33,6 +61,20 @@ typedef enum Sensor_Types {
 } Sensor_Type;
 
 
+
+/***************************************************************************/
+/**                                                                       **/
+/**                     EXPORTED VARIABLES                                **/
+/**                                                                       **/
+/***************************************************************************/
+extern CTRL_Mode mode;
+extern CTRL_State state;
+
+/***************************************************************************/
+/**                                                                       **/
+/**                     PROTOTYPES OF EXPORTED FUNCTIONS                  **/
+/**                                                                       **/
+/***************************************************************************/
 /* CTRL_InitSystem
  * Initialize the sail boat controller.
  * Status:
@@ -59,17 +101,12 @@ enum status_code CTRL_InitSensors(void);
  */ 
 enum status_code startup(void);
 
-
 /* init_tasks
  * Initialize all tasks
  * Status:
  *		STATUS_ERR_INSUFFICIENT_RTOS_HEAP - Contains error when system create task
  */ 
 enum status_code init_tasks();
-
-extern CTRL_Mode mode;
-extern CTRL_State state;
-
 
 /* UpdateCourse
  * Update Navigation Parameters
@@ -82,6 +119,10 @@ void UpdateCourse(void);
  */ 
 void ControlRudder(void);
 
+/* ControlSail
+*  Used to set the sail actuator position
+*/
+void ControlSail(void);
 
 /* LogData
  * Record all sensors data
@@ -106,24 +147,13 @@ void check_waypoint_state(void);
  */ 
 void assign_weatherstation_readings(void);
 
-
-/* process_wind_readings
- * Wind unit convert
- */ 
-void process_wind_readings(void);
-
-
-/* process_heading_readings
- * Heading unit convert
- */ 
-void process_heading_readings(void);
-
-
 /* CTRL_Sleep
  * Set the sleep time of the control unit
  * Input:
  *	 time_sec - sleep time length
  */ 
 static void CTRL_Sleep(unsigned time_sec);
+
+enum status_code CTRL_InitSail(void);
 
 #endif /* SAIL_CTRL_H_ */ 

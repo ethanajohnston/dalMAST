@@ -42,6 +42,7 @@ extern unsigned char watchdog_reset_value;
 #define LOG_DATA_PRIORITY                 tskIDLE_PRIORITY + 2
 #define READ_COMPASS_PRIORITY             tskIDLE_PRIORITY + 3
 #define WATCHDOG_PRIORITY                 tskIDLE_PRIORITY
+#define CONTROL_SAIL_PRIORITY			  tskIDLE_PRIORITY + 3
 
 #define WEATHER_SENSOR_STACK_SIZE         configMINIMAL_STACK_SIZE
 #define UPDATE_COURSE_STACK_SIZE          configMINIMAL_STACK_SIZE
@@ -51,12 +52,25 @@ extern unsigned char watchdog_reset_value;
 #define LOG_DATA_STACK_SIZE               configMINIMAL_STACK_SIZE 
 #define READ_COMPASS_STACK_SIZE           configMINIMAL_STACK_SIZE 
 #define WATCHDOG_STACK_SIZE               configMINIMAL_STACK_SIZE
+#define CONTROL_SAIL_STACK_SIZE			configMINIMAL_STACK_SIZE	
 
 // TODO: update this file
-enum all_tasks { eReadWeatherSensor, eUpdateCourse, eControlRudder, eRadioHandler, eLogData, eReadCompass};
+enum TaskList{
+	UpdateCourseTask,
+	ControlRudderTask,
+	ControlSailTask,
+	RadioHandlerTask,
+	LogDataTask,
+	ReadCompassTask,
+	eWatchDogTask,
+	
+	TotalTasks
+};
+
 extern volatile WEATHERSENSOR_AllMsgs weathersensor_data;
 
-extern enum all_tasks running_task;
+extern enum TaskList running_task;
 
+extern TaskHandle_t TaskHandles[TotalTasks];
 
 #endif

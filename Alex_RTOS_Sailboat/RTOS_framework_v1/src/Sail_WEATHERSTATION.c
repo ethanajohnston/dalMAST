@@ -64,7 +64,7 @@ void ReadWeatherSensor(void) {
 		
 		WeatherStation_On();
 		
-		running_task = eReadWeatherSensor;
+		//running_task = ReadWeatherSensor;
 		
 		WEATHERSENSOR_GenericMsg msg;
 

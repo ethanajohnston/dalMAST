@@ -13,7 +13,7 @@
 #include "task.h"
 #include "sail_math.h"
 #include "sail_debug.h"
-
+#define reply_error_length 50
 uint16_t beacon_msg_length [beacon_msg_type_total] ={
 	3,
 	5,
@@ -68,7 +68,7 @@ void DataLogTask(void){
 		
 		DEBUG_Write("\n\r <<<<<<<<<<< Do Log Data >>>>>>>>>>>\n\r");
 		
-		running_task = eLogData;
+		running_task = LogDataTask;
 		
 		rc = beacon_status();
 
@@ -99,7 +99,7 @@ enum status_code beacon_status(void){
 			DEBUG_Write_Unprotected("Invalid UART Channel\n\r");
 			break;
 		case STATUS_ERR_BAD_ADDRESS:
-			DEBUG_Write_Unprotected("Null Pointer Sent\n\r")	
+			DEBUG_Write_Unprotected("Null Pointer Sent\n\r");
 		default:
 			DEBUG_Write_Unprotected("ERROR Unhandled\n\r");	
 			break;

@@ -37,6 +37,8 @@ and all of the task's running functions
 #include <stdbool.h>
 #include <stdint.h>
 /* Sail Headers */
+#include "sail_adc.h"
+#include "sail_pwm.h"
 #include "sail_ctrl.h"
 #include "sail_math.h"
 #include "sail_debug.h"
@@ -54,7 +56,15 @@ and all of the task's running functions
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "task.h"
-
+/***************************************************************************/
+/**                                                                       **/
+/**                     DEFINITIONS AND MACROS                            **/
+/**                                                                       **/
+/***************************************************************************/
+#ifdef DEBUG 
+#define CONTROL_TEST 2
+#define CONTROL_TEST_SLEEP_PERIOD_MS 100000 //10 seconds
+#endif
 /***************************************************************************/
 /**                                                                       **/
 /**                     GLOBAL VARIABLES                                  **/
@@ -85,6 +95,7 @@ uint16_t wp_complete_count; // Counter to track # of times distance < radius
 double wp_distance;
 float course, bearing, sail_deg, rudder_deg;
 float avg_heading_deg = 0.0;
+enum TaskList running_task;
 /***************************************************************************/
 /**                                                                       **/
 /**                     PROTOTYPES OF LOCAL FUNCTIONS                     **/
@@ -151,12 +162,12 @@ enum status_code CTRL_InitSystem(void)
 	}
 	RADIO_TxMsg_Unprotected(&tx_msg);
 
-	
+	#ifndef DEBUG
 	// Initialize the EEPROM
 	if (EEPROM_Init() != STATUS_OK) {
 		DEBUG_Write_Unprotected("EEPROM not initialized!\r\n");
 	}
-	
+	#endif
 	// Set default mode and state
 	mode = CTRL_MODE_AUTO;
 	state = CTRL_STATE_TEST;
@@ -194,6 +205,7 @@ enum status_code CTRL_InitSail(void)
 	PWM_Init();
 	// Turn on the timer
 	InitTimer();
+	
 	return STATUS_OK;
 	
 }
@@ -245,7 +257,7 @@ void LogData(void)
 		DEBUG_Write("----------------------Do log data-------------------\r\n");
 		
 		RADIO_GenericMsg tx_msg_log;
-	    running_task = eLogData;
+	    running_task = LogDataTask;
 		
 		// Log the GPS coordinates
 		tx_msg_log.type = RADIO_GPS;
@@ -289,7 +301,6 @@ void ControlRudder(void)
 	
 	// Event bits for holding the state of the event group
 	EventBits_t event_bits;
-	
 	TickType_t control_rudder_delay = pdMS_TO_TICKS(CONTROL_RUDDER_SLEEP_PERIOD_MS);
 	
 	while(1) {
@@ -307,7 +318,7 @@ void ControlRudder(void)
 										 
 	    DEBUG_Write("***************************Do rudder***********************\r\n");
 		
-		running_task = eControlRudder;
+		running_task = ControlRudderTask;
 		/*NAV_CalculateRudderPosition(course, comp.data.heading.heading, &rudder_deg);
 		DEBUG_Write("Setting rudder - %d\r\n", (int)rudder_deg);
 		MOTOR_SetRudder(rudder_deg); */
@@ -317,35 +328,78 @@ void ControlRudder(void)
 	}
 }
 /***************************************************************************/
+void ControlSail(void)
+{
+	EventBits_t event_bits;
+	TickType_t control_sail_delay = pdMS_TO_TICKS(CONTROL_SAIL_SLEEP_PERIOD_MS);
+	
+	while(1){
+			
+			event_bits = xEventGroupWaitBits(mode_event_group,    /* Test the mode event group */
+			CTRL_MODE_AUTO_BIT,  /* Wait until the sailboat is in AUTO mode */
+			pdFALSE,             /* Bits should not be cleared before returning. */
+			pdFALSE,             /* Don't wait for both bits, either bit will do. */
+			portMAX_DELAY);      /* Wait time does not expire */
+			
+			taskENTER_CRITICAL();
+			watchdog_counter |= 0x04;
+			taskEXIT_CRITICAL();
+			
+			running_task = ControlSailTask;		
+			
+			DEBUG_Write("***************************Do Sail***********************\r\n");
+			
+			DEBUG_Write("checking task notifications \n\r");	
+			
+			vTaskDelay(control_sail_delay);	
+	}
+	return;
+}
+/***************************************************************************/
 void UpdateCourse(void)
 {
 	// Event bits for holding the state of the event group
 	EventBits_t event_bits;
-	
 	TickType_t update_course_delay = pdMS_TO_TICKS(UPDATE_COURSE_SLEEP_PERIOD_MS);
-
+	
+	#ifdef DEBUG
+	double rudder_pos [CONTROL_TEST] ={-90.0, 90.0};
+	double sail_pos [CONTROL_TEST] = {-90.0, 90.0};	
+	#endif
+	
 	while(1) {
-		
 		event_bits = xEventGroupWaitBits(mode_event_group,    /* Test the mode event group */
 		CTRL_MODE_AUTO_BIT,  /* Wait until the sailboat is in AUTO mode */
 		pdFALSE,             /* Bits should not be cleared before returning. */
 		pdFALSE,             /* Don't wait for both bits, either bit will do. */
 		portMAX_DELAY);      /* Wait time does not expire */
-		
+				
 		taskENTER_CRITICAL();
 		watchdog_counter |= 0x02;
 		taskEXIT_CRITICAL();
+		running_task = UpdateCourseTask;
 		
-		DEBUG_Write("\n<<<<<<<<<<<<<<<<<<<<<<<Do update course>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
-		
-		running_task = eUpdateCourse;
-		
+		#ifdef DEBUG
+		//DEBUG_Write_Unprotected("\n ------------------ Running Rudder/Sail Tests ------------------ \n\r");
+		for (int i = 0; i < CONTROL_TEST; ++i)
+		{
+			DEBUG_Write("Setting Rudder to pos: %d\n\r",rudder_pos[i]);
+			MOTOR_SetRudder(rudder_pos[i]);
+			
+			DEBUG_Write("Setting Sail to pos: %d\n\r", sail_pos[i]);
+			SetActuatorPos(sail_pos[i]);
+			
+			DEBUG_Write("Delaying 10 seconds\n\r");
+			vTaskDelay(pdMS_TO_TICKS(CONTROL_TEST_SLEEP_PERIOD_MS));
+		}
+		#else
 		//update course
 		NAV_UpdateCourse(wp.pos, gps, avg_wind, avg_heading_deg, &course, &sail_deg);
 		
 		DEBUG_Write("course: %6d  sail: %d\r\n", (int)(course*1000.0), (int)(sail_deg*1000.0));
-		MOTOR_SetSail(sail_deg);
+		MOTOR_SetSail(sail_deg);		
 		
+		#endif
 		vTaskDelay(update_course_delay);
 
 	}
@@ -357,7 +411,6 @@ void ReadCompass(void)
 	
 	// Event bits for holding the state of the event group
 	EventBits_t event_bits;
-	
 	TickType_t read_compass_delay = pdMS_TO_TICKS(READ_COMPASS_SLEEP_PERIOD_MS);
 
 	while(1) {
@@ -374,7 +427,7 @@ void ReadCompass(void)
 		
 		DEBUG_Write("\n<<<<<<<<<<<<<<<<<<<<<<<Do read compass>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
 		
-		running_task = eReadCompass;
+		running_task = ReadCompassTask;
 		
 
 		// Get the compass reading
@@ -501,13 +554,15 @@ static void InitPins(void)
 	// Set the power pin for the rudder
 	port_pin_set_config(RUDDER_POWER_PIN, &config_port_pin);
 	// Set the power pin for the sail
-	port_pin_set_config(SAIL_POWER_PIN,&config_port_pin);
+	port_pin_set_config(ACTUATOR_PWR_PIN,&config_port_pin);
 	// Set the rudder direction pin
 	port_pin_set_config(RUDDER_DIR_PIN, &config_port_pin);
 }
 /***************************************************************************/
 static void InitTimer(void)
 {
+	static struct tc_module timer;
+	static Tc *const timer_hw = TC0;
 	// Get the default configuration
 	struct tc_config timer_config;
 	tc_get_config_defaults(&timer_config);

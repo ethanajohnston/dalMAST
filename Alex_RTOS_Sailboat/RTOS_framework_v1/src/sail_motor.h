@@ -66,7 +66,7 @@ enum status_code MOTOR_SetSail(double angle);
  */
 enum status_code MOTOR_SetRudder(double angle);
 
-static void ShaftControlCallback(struct tc_module *const module_inst);
+extern void ShaftControlCallback(struct tc_module *const module_inst);
 
 #endif // SAIL_MOTOR_H_
 /***************************************************************************/

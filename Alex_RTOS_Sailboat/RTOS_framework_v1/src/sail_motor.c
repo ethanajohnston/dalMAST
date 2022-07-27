@@ -30,14 +30,14 @@
 /**                                                                       **/
 /***************************************************************************/
 #define MOTOR_ON_STATE			true
-#define shaft_min_deg			0.0;
-#define shaft_max_deg			90.0;
-#define shaft_neutral_deg		45.0;
-#define shaft_threshold_deg		1.0;
-#define shaft_motor_min_speed	100.0;
-#define shaft_motor_max_speed	PWM_MAX_DUTY;
-#define error_min_deg			5.0;
-#define error_max_deg			20.0;
+#define shaft_min_deg			0.0
+#define shaft_max_deg			90.0
+#define shaft_neutral_deg		45.0
+#define shaft_threshold_deg		1.0
+#define shaft_motor_min_speed	100.0
+#define shaft_motor_max_speed	PWM_MAX_DUTY
+#define error_min_deg			5.0
+#define error_max_deg			20.0
 /***************************************************************************/
 /**                                                                       **/
 /**                     TYPDEFS AND STRUCTURES                            **/
@@ -50,9 +50,9 @@ typedef enum MOTOR_Directions {
 
 typedef struct RudderMotor
 {
-	bool		on = false;
-	double		current_shaft_deg = shaft_min_deg - 100.0;
-	double		target_shaft_deg  = shaft_neutral_deg;
+	bool		on;
+	double		current_shaft_deg;
+	double		target_shaft_deg;
 	
 }RudderMotor_t;
 /***************************************************************************/
@@ -61,7 +61,7 @@ typedef struct RudderMotor
 /**                                                                       **/
 /***************************************************************************/
 // Define the angle range for each motor
-RudderMotor_t motor;
+RudderMotor_t motor = {false,shaft_min_deg - 100.0,shaft_neutral_deg};
 
 static uint16_t shaft_threshold_count   =   0;
 static const uint16_t required_count    =   2;
@@ -112,7 +112,7 @@ enum status_code MOTOR_SetRudder(double rudder_deg)
 		// Enable callback
 		tc_enable_callback(&timer, TC_CALLBACK_CC_CHANNEL1);
 		// Turn on the motor
-		RuddderOn();
+		RudderOn();
 	}
 
 	motor.current_shaft_deg = motor.target_shaft_deg;
@@ -121,7 +121,7 @@ enum status_code MOTOR_SetRudder(double rudder_deg)
 }
 
 /***************************************************************************/
-static void ShaftControlCallback(struct tc_module *const module_inst)
+void ShaftControlCallback(struct tc_module *const module_inst)
 {
 	double shaft_volt;
 	
@@ -160,7 +160,7 @@ static void ShaftControlCallback(struct tc_module *const module_inst)
 	
 	// Update the motor
 	PWM_SetDuty(PWM_RUDDER, speed);
-	SetDirection(RUDDER_DIR_PIN, (shaft_error_deg >= 0.0 ? MOTOR_CCW : MOTOR_CW));
+	SetDirection((shaft_error_deg >= 0.0 ? MOTOR_CCW : MOTOR_CW));
 }
 /***************************************************************************/
 /**                                                                       **/
@@ -190,7 +190,7 @@ static uint8_t SpeedControl(double error_deg)
 }
 /***************************************************************************/
 // Function to turn on the specified motor
-static void RuddderOn(void)
+static void RudderOn(void)
 {
 	motor.on = true;
 	// Set the pin
