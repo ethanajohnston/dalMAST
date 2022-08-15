@@ -19,7 +19,7 @@
 // Mapping between NMEA channels and UART channels
 static UART_ChannelID uart_channels[] = {
 	UART_GPS,
-	UART_WEATHERSTATION,
+	UART_WIND,
 	UART_RADIO
 };
 

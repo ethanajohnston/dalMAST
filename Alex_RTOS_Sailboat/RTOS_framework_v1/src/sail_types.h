@@ -79,27 +79,27 @@ typedef enum COMP_ReadingTypes {
 } COMP_ReadingType;
 
 typedef struct COMP_AccelData {
-	float x;
-	float y;
-	float z;
+	signed short a_x;
+	signed short a_y;
+	signed short a_z;
 } COMP_AccelData;
 
 typedef struct COMP_MagData {
-	float x;
-	float y;
-	float z;
+	signed short m_x;
+	signed short m_y;
+	signed short m_z;
 } COMP_MagData;
 
 typedef struct COMP_HeadingData {
-	float heading;
-	float pitch;
-	float roll;
+	uint16_t heading;
+	uint16_t h_pitch;
+	uint16_t h_roll;
 } COMP_HeadingData;
 
 typedef struct COMP_TiltData {
-	float pitch;
-	float roll;
-	float temp;
+	signed short t_pitch;
+	signed short t_roll;
+	signed short temp;
 } COMP_TiltData;
 
 typedef struct COMP_Reading {
@@ -109,10 +109,13 @@ typedef struct COMP_Reading {
 		COMP_MagData mag;
 		COMP_HeadingData heading;
 		COMP_TiltData tilt;
-		double fields[3];
+		uint16_t fields[3];
 	} data;
 } COMP_Reading;
 
+typedef struct Compass_Data{
+	COMP_Reading type[COMP_NUM_TYPES];
+} Compass_Data_t;
 
 /**** EEPROM ************************************************************
  * Data structures and enumerations for reading and writing to the EEPROM.

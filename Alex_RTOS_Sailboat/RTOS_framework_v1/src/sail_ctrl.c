@@ -38,6 +38,8 @@ static void DisableWeatherStation(void);
 void process_heading_readings(void);
 
 
+
+
 /* Message handling functions:
  * HandleMessage()
  * - checks the message type and calls the appropriate function
@@ -157,6 +159,7 @@ enum status_code CTRL_InitSensors(void)
 		DEBUG_Write_Unprotected("Compass not initialized...\r\n");
 	}
 	//DEBUG_Write("Test 123");
+	#if 0
 	if (WEATHERSTATION_Init() != STATUS_OK) {
 		DEBUG_Write_Unprotected("WS not initialized...\r\n");
 	}
@@ -164,7 +167,7 @@ enum status_code CTRL_InitSensors(void)
 		DEBUG_Write_Unprotected("WS initialized.\r\n");
 		//DEBUG_Write("WS initialized.\r\n");
 	}
-	
+	#endif
 	return STATUS_OK;
 }
 
@@ -193,7 +196,6 @@ enum status_code startup(void)
 	
 	return STATUS_OK;
 }
-
 
 
 
@@ -324,8 +326,8 @@ void assign_weatherstation_readings(void) {
 	//assign compass readings
 	//comp.data.heading.heading = weathersensor_data.msg_array[eGPVTG].fields.gpvtg.course_over_ground;
 	comp.data.heading.heading = weathersensor_data.msg_array[eHCHDT].fields.hchdt.bearing;
-	comp.data.heading.pitch = weathersensor_data.msg_array[eYXXDR].fields.yxxdr.pitch_deg;
-	comp.data.heading.roll = weathersensor_data.msg_array[eYXXDR].fields.yxxdr.roll_deg;
+	comp.data.heading.h_pitch = weathersensor_data.msg_array[eYXXDR].fields.yxxdr.pitch_deg;
+	comp.data.heading.h_roll = weathersensor_data.msg_array[eYXXDR].fields.yxxdr.roll_deg;
 	
 	//assign distance between boat and waypoint to wp_distance
 	//NAV_GetDistance(wp.pos, gps, &wp_distance);
@@ -360,6 +362,7 @@ void ControlRudder(void)
 	    DEBUG_Write("***************************Do rudder***********************\r\n");
 		
 		running_task = eControlRudder;
+		
 		/*NAV_CalculateRudderPosition(course, comp.data.heading.heading, &rudder_deg);
 		DEBUG_Write("Setting rudder - %d\r\n", (int)rudder_deg);
 		MOTOR_SetRudder(rudder_deg); */
@@ -396,6 +399,9 @@ void UpdateCourse(void)
 {
 	// Event bits for holding the state of the event group
 	EventBits_t event_bits;
+	bool read_flag = false;
+	Compass_Data_t compData;
+	short compass_health = 0;
 	
 	TickType_t update_course_delay = pdMS_TO_TICKS(UPDATE_COURSE_SLEEP_PERIOD_MS);
 
@@ -415,8 +421,38 @@ void UpdateCourse(void)
 		
 		running_task = eUpdateCourse;
 		
+		for(int i = 0; i < COMP_NUM_TYPES; ++i){
+			if (xQueueReceive(queue_compass,&compData.type[i],(TickType_t) 0) == pdFALSE){
+				#ifdef DEBUG
+				DEBUG_Write("Error Reading Queue\n\r");
+				#endif
+				read_flag = true;
+				break;
+			}
+			read_flag = true;
+		}
+				
+		#ifdef DEBUG		
+		DEBUG_Write("Accel: x >%ld< y >%ld< z >%ld< \n\r"
+			,compData.type[COMP_ACCEL].data.accel.a_x
+			,compData.type[COMP_ACCEL].data.accel.a_y
+			,compData.type[COMP_ACCEL].data.accel.a_z);
+		DEBUG_Write("Mag: x >%ld< y >%ld< z >%ld< \n\r"
+			,compData.type[COMP_MAG].data.mag.m_x
+			,compData.type[COMP_MAG].data.mag.m_y
+			,compData.type[COMP_MAG].data.mag.m_z);
+		DEBUG_Write("Heading: >%ld< P: >%ld< R: >%ld< \n\r"
+			,compData.type[COMP_HEADING].data.heading.heading
+			,compData.type[COMP_HEADING].data.heading.h_pitch
+			,compData.type[COMP_HEADING].data.heading.h_roll);			
+		DEBUG_Write("Tilt: p >%ld< r >%ld< t >%ld< \n\r"
+			,compData.type[COMP_TILT].data.tilt.t_pitch
+			,compData.type[COMP_TILT].data.tilt.t_roll
+			,compData.type[COMP_TILT].data.tilt.temp);
+		#endif
+		
 		//update course
-		NAV_UpdateCourse(wp.pos, gps, avg_wind, avg_heading_deg, &course, &sail_deg);
+		//NAV_UpdateCourse(wp.pos, gps, avg_wind, avg_heading_deg, &course, &sail_deg);
 		/*
 		DEBUG_Write("course: %6d  sail: %d\r\n", (int)(course*1000.0), (int)(sail_deg*1000.0));
 		MOTOR_SetSail(sail_deg);
@@ -426,48 +462,6 @@ void UpdateCourse(void)
 	}
 	
 }
-
-void ReadCompass(void)
-{
-	
-	// Event bits for holding the state of the event group
-	EventBits_t event_bits;
-	
-	TickType_t read_compass_delay = pdMS_TO_TICKS(READ_COMPASS_SLEEP_PERIOD_MS);
-
-	while(1) {
-				
-		event_bits = xEventGroupWaitBits(mode_event_group,                        /* Test the mode event group */
-										 CTRL_MODE_AUTO_BIT | CTRL_MODE_REMOTE_BIT, /* Wait until the sailboat is in AUTO or REMOTE mode */
-										 pdFALSE,                                 /* Bits should not be cleared before returning. */
-									     pdFALSE,                                 /* Don't wait for both bits, either bit will do. */
-									 	 portMAX_DELAY);                          /* Wait time does not expire */
-										 
-		taskENTER_CRITICAL();
-		watchdog_counter |= 0x20;
-		taskEXIT_CRITICAL();
-										 
-	    DEBUG_Write("\n<<<<<<<<<<<<<<<<<<<<<<<Do read compass>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
-		
-		running_task = eReadCompass;
-		
-
-		// Get the compass reading
-		if(COMP_GetReading(COMP_HEADING, &comp) !=  STATUS_OK){
-			DEBUG_Write("\nERROR\r\n");
-		}
-
-		// Update the averaged heading
-		avg_heading_deg = 0.9 * avg_heading_deg + 0.1 * comp.data.heading.heading;
-		
-		vTaskDelay(read_compass_delay);
-
-	}
-
-
-}
-
-
 
 static void CTRL_Sleep(unsigned time_sec) {
 	vTaskDelay(time_sec * configTICK_RATE_HZ);;

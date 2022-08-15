@@ -414,8 +414,8 @@ static enum status_code RADIO_ExtractData(RADIO_MsgRawData *data, RADIO_GenericM
 			data->type = RADIO_COMP;
 			data->args[0] = msg->fields.comp.data.type = COMP_HEADING;
 			data->args[1] = (int32_t)(msg->fields.comp.data.data.heading.heading*10.0);
-			data->args[2] = (int32_t)(msg->fields.comp.data.data.heading.pitch*10.0);
-			data->args[3] = (int32_t)(msg->fields.comp.data.data.heading.roll*10.0);
+			data->args[2] = (int32_t)(msg->fields.comp.data.data.heading.h_pitch*10.0);
+			data->args[3] = (int32_t)(msg->fields.comp.data.data.heading.h_roll*10.0);
 			/* This used to be here .
 			data->args[1] = (int32_t)(msg->fields.comp.data.data.fields[0]*10.0);
 			data->args[2] = (int32_t)(msg->fields.comp.data.data.fields[1]*10.0);
