@@ -50,6 +50,7 @@ b
 #define COMP_HEALTH_BIT			(0x020)
 
 
+#define GPS_PRIORITY					  tskIDLE_PRIORITY + 3
 #define WEATHER_SENSOR_PRIORITY           tskIDLE_PRIORITY + 4
 #define UPDATE_COURSE_PRIORITY            tskIDLE_PRIORITY + 3
 #define CONTROL_RUDDER_PRIORITY           tskIDLE_PRIORITY + 3
@@ -58,6 +59,7 @@ b
 #define READ_COMPASS_PRIORITY             tskIDLE_PRIORITY + 3
 #define WATCHDOG_PRIORITY                 tskIDLE_PRIORITY
 
+#define GPS_STACK_SIZE					  configMINIMAL_STACK_SIZE + 100
 #define WEATHER_SENSOR_STACK_SIZE         configMINIMAL_STACK_SIZE
 #define UPDATE_COURSE_STACK_SIZE          configMINIMAL_STACK_SIZE
 #define CONTROL_RUDDER_STACK_SIZE         configMINIMAL_STACK_SIZE
@@ -69,7 +71,6 @@ b
 
 // TODO: update this file
 enum all_tasks { eReadWeatherSensor, eUpdateCourse, eControlRudder, eRadioHandler, eLogData, eReadCompass};
-extern volatile WEATHERSENSOR_AllMsgs weathersensor_data;
 
 extern enum all_tasks running_task;
 

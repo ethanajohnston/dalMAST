@@ -14,6 +14,7 @@
 #include "usart_interrupt.h"
 #include "sail_nmea.h"
 #include "Sail_WEATHERSTATION.h"
+#include "sail_gps.h"
 #include "sail_types.h"
 #include "sail_nav.h"
 #include "sail_ctrl.h"
@@ -35,7 +36,6 @@ enum status_code init_tasks(void) {
 	
 	// Initialize the mode event group
 	mode_event_group = xEventGroupCreate();
-	Event_Compass = xEventGroupCreate();
 	// Initialize the mutexes for writing to the uart buffers
 	int i;
 	for(i = 0; i < UART_NUM_CHANNELS; i++){
@@ -50,16 +50,15 @@ enum status_code init_tasks(void) {
 		DEBUG_Write_Unprotected("Compass Queue Good\n\r");
 	}
 	
-	// Initialize Task Notifications 
-	
 	
 	// Initialize the watchdog counter
 	watchdog_counter = 0;
 	
+	// Task for reading incoming data from the GPS
+	xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
+
 	// Task for reading incoming data from the weather station
 	//xTaskCreate(ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
-	//queue_list[qGps] = xQueueCreate(5,sizeof(Gps Struct));
-	//queue_list[qWind] = xQueueCreate(5,sizeof(Wind Struct));
 	// Task for updating the course of the sailboat
 	xTaskCreate(UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE + 100, NULL, UPDATE_COURSE_PRIORITY, NULL );
 	
@@ -147,5 +146,4 @@ void Update_Event_Bits(EventBits_t * mask)
 	
 	return;
 }
-
 

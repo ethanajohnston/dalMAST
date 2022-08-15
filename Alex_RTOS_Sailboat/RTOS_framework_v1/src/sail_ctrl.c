@@ -16,7 +16,7 @@
 #include "sail_motor.h"
 #include "sail_comp.h"
 #include "sail_tasksinit.h"
-#include "Sail_WEATHERSTATION.h"
+#include "sail_gps.h"
 #include "delay.h"
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
@@ -86,8 +86,6 @@ float course, bearing, sail_deg, rudder_deg;
 float avg_heading_deg = 0.0;
 
 
-
-
 enum status_code CTRL_InitSystem(void)
 {
 	// Initialize SAMD20
@@ -153,12 +151,9 @@ enum status_code CTRL_InitSystem(void)
 enum status_code CTRL_InitSensors(void)
 {
 	
-	//todo: add initialization for AIS module
-	//DEBUG_Write("Test 456");
 	if (COMP_Init() != STATUS_OK) {
 		DEBUG_Write_Unprotected("Compass not initialized...\r\n");
 	}
-	//DEBUG_Write("Test 123");
 	#if 0
 	if (WEATHERSTATION_Init() != STATUS_OK) {
 		DEBUG_Write_Unprotected("WS not initialized...\r\n");
@@ -313,21 +308,10 @@ void process_heading_readings(void)
 	avg_heading_deg = 0.9 * avg_heading_deg + 0.1 * comp.data.heading.heading;
 }
 
-
-
-
-void assign_weatherstation_readings(void) {
+void assign_gps_readings(void) {
 	//assign gps weather sensor data to gps struct
-	gps.lat = weathersensor_data.msg_array[eGPGGA].fields.gpgga.lat.lat;
-	gps.lon = weathersensor_data.msg_array[eGPGGA].fields.gpgga.lon.lon;
-	//assign wind readings
-	wind.angle = weathersensor_data.msg_array[eWIMWV].fields.wimwv.wind_dir_rel;
-	wind.speed = weathersensor_data.msg_array[eWIMWV].fields.wimwv.wind_speed_ms;
-	//assign compass readings
-	//comp.data.heading.heading = weathersensor_data.msg_array[eGPVTG].fields.gpvtg.course_over_ground;
-	comp.data.heading.heading = weathersensor_data.msg_array[eHCHDT].fields.hchdt.bearing;
-	comp.data.heading.h_pitch = weathersensor_data.msg_array[eYXXDR].fields.yxxdr.pitch_deg;
-	comp.data.heading.h_roll = weathersensor_data.msg_array[eYXXDR].fields.yxxdr.roll_deg;
+	gps.lat = GPS_data.msg_array[eGPGGA].fields.gpgga.lat.lat;
+	gps.lon = GPS_data.msg_array[eGPGGA].fields.gpgga.lon.lon;
 	
 	//assign distance between boat and waypoint to wp_distance
 	//NAV_GetDistance(wp.pos, gps, &wp_distance);
@@ -335,8 +319,6 @@ void assign_weatherstation_readings(void) {
 	//NAV_GetBearing(wp.pos, gps, &bearing);
 	
 }
-
-
 
 void ControlRudder(void)
 {
