@@ -399,10 +399,20 @@ void UpdateCourse(void)
 										 
 	    DEBUG_Write("\n<<<<<<<<<<<<<<<<<<<<<<<Do update course>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
 		
+        int mytemp = 0; 
+        
+        if (xQueueReceive(queue_gps, &mytemp, (TickType_t) 0) == pdFALSE){
+            #ifdef DEBUG
+            DEBUG_Write('No data for gps queue? (While reading)\n\r');
+            #endif
+        } else {
+            DEBUG_Write('Value in queue %d\n\r', mytemp);
+        }
+        
 		running_task = eUpdateCourse;
 		
 		//update course
-		NAV_UpdateCourse(wp.pos, gps, avg_wind, avg_heading_deg, &course, &sail_deg);
+		//NAV_UpdateCourse(wp.pos, gps, avg_wind, avg_heading_deg, &course, &sail_deg);
 		/*
 		DEBUG_Write("course: %6d  sail: %d\r\n", (int)(course*1000.0), (int)(sail_deg*1000.0));
 		MOTOR_SetSail(sail_deg);

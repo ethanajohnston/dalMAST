@@ -46,6 +46,14 @@ enum status_code init_tasks(void) {
 	// Initialize the watchdog counter
 	watchdog_counter = 0;
 	
+    queue_gps = xQueueCreate(5, sizeof(int));
+    if (queue_gps == NULL){
+       DEBUG_Write_Unprotected('Failed to allocate memory for gps queue');
+       return -1;
+    }
+    
+    
+    
 	// Task for reading incoming data from the GPS
 	xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
 
@@ -53,7 +61,7 @@ enum status_code init_tasks(void) {
 	//xTaskCreate( ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
 	
 	// Task for updating the course of the sailboat
-	//xTaskCreate( UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, NULL );
+	xTaskCreate( UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, NULL );
 	
 	// Task for changing the position of the rudder
 	//xTaskCreate( ControlRudder, NULL, CONTROL_RUDDER_STACK_SIZE, NULL, CONTROL_RUDDER_PRIORITY, NULL );

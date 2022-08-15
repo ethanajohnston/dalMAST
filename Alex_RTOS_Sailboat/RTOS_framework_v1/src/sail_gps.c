@@ -45,6 +45,8 @@ void ReadGPS(void) {
 	EventBits_t event_bits;
 
 	TickType_t read_gps_delay = pdMS_TO_TICKS(GPS_SLEEP_PERIOD_MS);
+    
+    GPS_On();
 
 	while (1) {
 
@@ -60,12 +62,32 @@ void ReadGPS(void) {
 		
 		DEBUG_Write("********** Performing GPS Reading **********\r\n");
 		
-		GPS_On();
+		//GPS_On();
 
 		running_task = eReadWeatherSensor; //Replace this with gps, see tasksinit.c/.h
-
+        
 		NMEA_GenericMsg msg;
-
+        
+        // Make sure to add this to the if statement below later... (make sure gps msg okay)
+        // Change 4 to something appropriate later
+        if (uxQueueSpacesAvailable(queue_gps) < 4){
+            xQueueReset(queue_gps);
+            #ifdef DEBUG
+            DEBUG_Write('Empty queue gps \n\r');
+            #endif
+        }
+        
+        int temp = 42069;
+        
+        if(xQueueSendToFront(queue_gps, &temp, portMAX_DELAY) != pdPASS){
+            #ifdef DEBUG
+            DEBUG_Write('Failed to write gps msg to queue\n\r');
+            #endif
+        } else {
+            DEBUG_Write('Value was queued (int)\n\r');
+        }
+        
+/*
 		if (GPS_RxMsg(&msg) == STATUS_OK) {
 			loop_cnt++;
 			//DEBUG_Write("\nStatus OK\n");
@@ -91,7 +113,8 @@ void ReadGPS(void) {
 			DEBUG_Write("processing heading...\r\n");
 			//calculate heading parameters
 			process_heading_readings();			
-		}
+		} */
+        //DEBUG_Write_Unprotected('IM GONNA DELAYYYY\n\r');
 		vTaskDelay(read_gps_delay);
 	}
 }
@@ -262,13 +285,13 @@ static enum status_code GPS_ExtractMsg(NMEA_GenericMsg* msg, GPS_MsgRawData_t* d
 		}
 		//TODO
 		//wrap this so it only shows during debug config
-		#ifdef DEBUG_GPS{
+		#ifdef DEBUG_GPS
 		DEBUG_Write("LAT DATA: >%s<\r\n", data->args[1]);
 		DEBUG_Write("LON DATA: >%s<\r\n", data->args[3]);
 		
 		DEBUG_Write("LAT DATA: >%d<\r\n", (int)msg->fields.gpgga.lat.lat);
 		DEBUG_Write("LON DATA: >%f<\r\n", msg->fields.gpgga.lon.lon);
-		}endif
+		#endif
 
 		break;
 

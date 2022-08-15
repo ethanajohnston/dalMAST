@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "FreeRTOS.h"
+#include "queue.h"
 #include "sail_nmea.h"
 
 #define GPS_MSG_MAX_ARGS 9 
@@ -41,6 +43,9 @@ void write_to_gps(const char* format, ...);
 void ReadGPS(void);
 void GPS_On(void);
 void GPS_Sleep_Sec(unsigned time_sec);
+
+// Define the queue struct 
+QueueHandle_t queue_gps; 
 
 enum status_code GPS_Init(void);
 enum status_code GPS_Enable(void);
