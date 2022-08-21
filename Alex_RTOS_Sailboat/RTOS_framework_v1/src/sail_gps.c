@@ -45,12 +45,13 @@ void ReadGPS(void) {
 	EventBits_t event_bits;
 
 	TickType_t read_gps_delay = pdMS_TO_TICKS(GPS_SLEEP_PERIOD_MS);
-    
-    GPS_On();
-
+   // NMEA_GenericMsg msg;
+    //GPS_On();
+	int temp = 0;
+	
 	while (1) {
-
-		event_bits = xEventGroupWaitBits(mode_event_group,                        /* Test the mode event group */
+		
+		event_bits = xEventGroupWaitBits(mode_event_group, /* Test the mode event group */
 			CTRL_MODE_AUTO_BIT | CTRL_MODE_REMOTE_BIT, /* Wait until the sailboat is in AUTO or REMOTE mode */
 			pdFALSE,                                 /* Bits should not be cleared before returning. */
 			pdFALSE,                                 /* Don't wait for both bits, either bit will do. */
@@ -60,33 +61,28 @@ void ReadGPS(void) {
 		watchdog_counter |= 0x01;
 		taskEXIT_CRITICAL();
 		
-		DEBUG_Write("********** Performing GPS Reading **********\r\n");
-		
-		//GPS_On();
-
 		running_task = eReadWeatherSensor; //Replace this with gps, see tasksinit.c/.h
-        
-		NMEA_GenericMsg msg;
-        
+		
+		DEBUG_Write("********** Performing GPS Reading **********\r\n");
+      
         // Make sure to add this to the if statement below later... (make sure gps msg okay)
         // Change 4 to something appropriate later
-        if (uxQueueSpacesAvailable(queue_gps) < 4){
+        
+		if (uxQueueSpacesAvailable(queue_gps) < 4){
             xQueueReset(queue_gps);
-            #ifdef DEBUG
-            DEBUG_Write('Empty queue gps \n\r');
-            #endif
-        }
-        
-        int temp = 42069;
-        
-        if(xQueueSendToFront(queue_gps, &temp, portMAX_DELAY) != pdPASS){
-            #ifdef DEBUG
-            DEBUG_Write('Failed to write gps msg to queue\n\r');
-            #endif
+            temp = 0;
+			DEBUG_Write("Emptyed queue gps \n\r");
         } else {
-            DEBUG_Write('Value was queued (int)\n\r');
+			temp++;
+			DEBUG_Write("Queue ok \n\r");
+		}
+        if(xQueueSendToFront(queue_gps, &temp, (TickType_t) 0) != pdPASS){
+            DEBUG_Write("Failed to write gps msg to queue\n\r");
+        } else {
+            DEBUG_Write("Value was queued (int) \n\r");
         }
-        
+		
+
 /*
 		if (GPS_RxMsg(&msg) == STATUS_OK) {
 			loop_cnt++;

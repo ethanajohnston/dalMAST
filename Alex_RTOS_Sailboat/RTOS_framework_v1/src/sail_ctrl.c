@@ -151,19 +151,25 @@ enum status_code CTRL_InitSensors(void)
 {
 	
 	//todo: add initialization for AIS module
-	//DEBUG_Write("Test 456");
 	if (COMP_Init() != STATUS_OK) {
 		DEBUG_Write_Unprotected("Compass not initialized...\r\n");
 	}
-	//DEBUG_Write("Test 123");
+	#if 0
 	if (WEATHERSTATION_Init() != STATUS_OK) {
 		DEBUG_Write_Unprotected("WS not initialized...\r\n");
 	}
 	else{
 		DEBUG_Write_Unprotected("WS initialized.\r\n");
-		//DEBUG_Write("WS initialized.\r\n");
 	}
-	
+	#endif 
+	if (GPS_Init() != STATUS_OK){
+		DEBUG_Write_Unprotected("GPS not Initialized..\n\r");
+	}
+	#ifdef DEBUG
+	else {
+		DEBUG_Write_Unprotected("GPS Initialized ... \n\r");		
+	}
+	#endif
 	return STATUS_OK;
 }
 
@@ -383,8 +389,8 @@ void UpdateCourse(void)
 	// Event bits for holding the state of the event group
 	EventBits_t event_bits;
 	
-	TickType_t update_course_delay = pdMS_TO_TICKS(UPDATE_COURSE_SLEEP_PERIOD_MS);
-
+	TickType_t update_course_delay = pdMS_TO_TICKS(1000);
+	int mytemp; 
 	while(1) {
 				
 		event_bits = xEventGroupWaitBits(mode_event_group,    /* Test the mode event group */
@@ -396,21 +402,22 @@ void UpdateCourse(void)
 		taskENTER_CRITICAL();
 		watchdog_counter |= 0x02;
 		taskEXIT_CRITICAL();
-										 
+		running_task = eUpdateCourse;	
+									 
 	    DEBUG_Write("\n<<<<<<<<<<<<<<<<<<<<<<<Do update course>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
-		
-        int mytemp = 0; 
+
         
+        //DEBUG_Write("Checking GPS Queue\n\r");
         if (xQueueReceive(queue_gps, &mytemp, (TickType_t) 0) == pdFALSE){
             #ifdef DEBUG
-            DEBUG_Write('No data for gps queue? (While reading)\n\r');
+            DEBUG_Write("No data for gps queue? (While reading)\n\r");
             #endif
         } else {
-            DEBUG_Write('Value in queue %d\n\r', mytemp);
+            DEBUG_Write("Value in queue %d\n\r", mytemp);
         }
         
-		running_task = eUpdateCourse;
-		
+				
+		DEBUG_Write("Hello\n\r");
 		//update course
 		//NAV_UpdateCourse(wp.pos, gps, avg_wind, avg_heading_deg, &course, &sail_deg);
 		/*

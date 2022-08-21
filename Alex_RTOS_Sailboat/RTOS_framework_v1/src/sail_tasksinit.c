@@ -33,7 +33,7 @@ unsigned char watchdog_counter;
 unsigned char watchdog_reset_value = 0x3F;
 
 enum status_code init_tasks(void) {
-	
+	//DEBUG_Write_Unprotected("Hello /n/r");
 	// Initialize the mode event group
 	mode_event_group = xEventGroupCreate();
 	
@@ -56,13 +56,13 @@ enum status_code init_tasks(void) {
     
 	// Task for reading incoming data from the GPS
 	xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
-
+	//DEBUG_Write_Unprotected("GPS task inited \n\r");
 	// Task for reading incoming data from the weather station
 	//xTaskCreate( ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
 	
 	// Task for updating the course of the sailboat
 	xTaskCreate( UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, NULL );
-	
+	//DEBUG_Write_Unprotected("Update Course INtied \n\r");
 	// Task for changing the position of the rudder
 	//xTaskCreate( ControlRudder, NULL, CONTROL_RUDDER_STACK_SIZE, NULL, CONTROL_RUDDER_PRIORITY, NULL );
 	
@@ -77,7 +77,7 @@ enum status_code init_tasks(void) {
 	
 	// Task for reseting the watchdog so that the microcontroller is not restarted
 	xTaskCreate( WatchDogTask, NULL, WATCHDOG_STACK_SIZE, NULL, WATCHDOG_PRIORITY, NULL );
-	
+	DEBUG_Write_Unprotected("Tasked Inited\n\r");
 	//pass control to FreeRTOS kernel
 	vTaskStartScheduler();
 	

@@ -800,6 +800,12 @@
     <Compile Include="src\sail_eeprom.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\sail_gps.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\sail_gps.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\sail_i2c.c">
       <SubType>compile</SubType>
     </Compile>
@@ -1560,9 +1566,6 @@
       <SubType>compile</SubType>
     </None>
     <None Include="src\ASF\thirdparty\CMSIS\README.txt">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\sail_nav.c.orig">
       <SubType>compile</SubType>
     </None>
   </ItemGroup>
