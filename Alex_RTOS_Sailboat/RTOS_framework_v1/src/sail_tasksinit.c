@@ -55,7 +55,7 @@ enum status_code init_tasks(void) {
 	watchdog_counter = 0;
 	
 	// Task for reading incoming data from the GPS
-	xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
+	//xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
 
 	// Task for reading incoming data from the weather station
 	//xTaskCreate(ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
@@ -66,7 +66,7 @@ enum status_code init_tasks(void) {
 	//xTaskCreate(ControlRudder, NULL, CONTROL_RUDDER_STACK_SIZE, NULL, CONTROL_RUDDER_PRIORITY, NULL );
 	
 	// Task for handling incoming messages to the radio
-	xTaskCreate(RadioHandler, NULL, RADIO_HANDLER_STACK_SIZE, NULL, RADIO_HANDLER_PRIORITY, NULL );
+	//xTaskCreate(RadioHandler, NULL, RADIO_HANDLER_STACK_SIZE, NULL, RADIO_HANDLER_PRIORITY, NULL );
 	
 	// Task for transmitting logs using the radio
 	//xTaskCreate(LogData, NULL, LOG_DATA_STACK_SIZE, NULL, LOG_DATA_PRIORITY, NULL );
@@ -137,7 +137,7 @@ void vApplicationDaemonTaskStartupHook(void) {
 	//StartWatchDog();
 }
 
-
+/*
 void Update_Event_Bits(EventBits_t * mask)
 {
 	EventBits_t curr_mask = xEventGroupGetBits(mode_event_group);
@@ -146,4 +146,4 @@ void Update_Event_Bits(EventBits_t * mask)
 	
 	return;
 }
-
+*/

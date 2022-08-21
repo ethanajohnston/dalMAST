@@ -16,6 +16,8 @@ src\sail_debug.c
 
 src\sail_eeprom.c
 
+src\sail_gps.c
+
 src\sail_i2c.c
 
 src\sail_math.c

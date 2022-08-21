@@ -268,7 +268,7 @@ static enum status_code GPS_ExtractMsg(NMEA_GenericMsg* msg, GPS_MsgRawData_t* d
 		
 		DEBUG_Write("LAT DATA: >%d<\r\n", (int)msg->fields.gpgga.lat.lat);
 		DEBUG_Write("LON DATA: >%f<\r\n", msg->fields.gpgga.lon.lon);
-		}endif
+		#endif
 
 		break;
 

@@ -342,11 +342,11 @@ void ReadCompass(void)
 		DEBUG_Write("\n<<<<<<<<<<<<<<<<<<<<<<<Do read compass>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
 		
 		running_task = eReadCompass;
-				
+		/*	
 		if(health_count >= COMPASS_HEALTH_CHECK){
 			Compass_Query_Health();
 		}
-		
+		*/
 		// Get the compass reading
 		switch(Compass_Poll_Data(&data))
 		{
@@ -427,6 +427,7 @@ enum status_code Send_Compass_Data(Compass_Data_t * data)
 	}
 	return STATUS_OK;
 }
+/*
 enum status_code Compass_Query_Health(void)
 {
 	uint8_t mode;
@@ -444,5 +445,5 @@ enum status_code Compass_Query_Health(void)
 	return rc;
 	
 };
-
+*/
 

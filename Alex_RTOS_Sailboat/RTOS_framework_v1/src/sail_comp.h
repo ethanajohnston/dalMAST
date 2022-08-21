@@ -16,7 +16,7 @@
 #define COMP_EVENT_BIT_OP 0x10
 
 
-EventGroupHandle_t Event_Compass;
+
 QueueHandle_t queue_compass;
 
 // COMP_Init
