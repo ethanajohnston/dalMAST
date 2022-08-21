@@ -29,14 +29,6 @@ extern unsigned char watchdog_counter;
 // This changes depending on the tasks that are running in a specific mode
 extern unsigned char watchdog_reset_value;
 
-/* Event Bits Break Down 
-b
-(Task Specific)	 Common Bits(Exclusive)
-	 23 - 8		     7- 0 
-----------------------------
-| 23 - 16 | 15 - 8 | 7 - 0 |
-----------------------------
-*/
 
 // The event bits for the mode event group
 /* Common Exclusive Bits */
@@ -44,11 +36,6 @@ b
 #define CTRL_MODE_REMOTE_BIT	(0x002)
 #define CTRL_MODE_LOAD_BIT		(0x004)
 #define CTRL_ALL_BITS			(0x007)
-/* Task Specific Bits  */
-
-/* Compass Bits */
-#define COMP_HEALTH_BIT			(0x020)
-
 
 #define GPS_PRIORITY					  tskIDLE_PRIORITY + 3
 #define WEATHER_SENSOR_PRIORITY           tskIDLE_PRIORITY + 4

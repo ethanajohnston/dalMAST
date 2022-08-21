@@ -3,12 +3,6 @@
  * Created on June 27, 2016.
  * Created by Thomas Gwynne-Timothy.
  */
-/*
-Revision by Matthew,
-Adding a improve version of the Debug function
-LOG(), will log msg and data items to the proper devices depending on the 
-sail boat configuration 
-*/ 
 #include "sail_debug.h"
 
 

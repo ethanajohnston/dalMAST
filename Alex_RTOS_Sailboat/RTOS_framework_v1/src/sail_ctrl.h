@@ -7,8 +7,6 @@
 #include "FreeRTOSConfig.h"
 #include "task.h"
 
-
-
 #include <asf.h>
 #include <status_codes.h>
 #include "sail_radio.h"
@@ -17,7 +15,7 @@
 
 #define UPDATECOURSE_ON_TIME_SEC 2
 #define UPDATECOURSE_LOOP_LIM  UPDATECOURSE_ON_TIME_SEC * configTICK_RATE_HZ
-#define UPDATE_COURSE_SLEEP_PERIOD_MS 750
+#define UPDATE_COURSE_SLEEP_PERIOD_MS 60000
 
 #define CONTROLRUDDER_ON_TIME_SEC 2
 #define CONTROLRUDDER_LOOP_LIM CONTROLRUDDER_ON_TIME_SEC * configTICK_RATE_HZ

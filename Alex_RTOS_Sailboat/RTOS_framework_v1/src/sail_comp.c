@@ -391,8 +391,6 @@ enum status_code Compass_Poll_Data(Compass_Data_t * data){
 		
 	for(int i = 0; i < COMP_NUM_TYPES; ++i){
 		rc = COMP_GetReading(i,&data->type[i]);
-		//DEBUG_Write("Data: >%ld< >%ld< >%ld< \n\r",data->type[i].data.fields[0],data->type[i].data.fields[1],
-			//data->type[i].data.fields[2]);
 		if(rc != STATUS_OK){
 			#ifdef DEBUG
 			DEBUG_Write("Failed Polling Compass at %d",i);
@@ -427,23 +425,3 @@ enum status_code Send_Compass_Data(Compass_Data_t * data)
 	}
 	return STATUS_OK;
 }
-/*
-enum status_code Compass_Query_Health(void)
-{
-	uint8_t mode;
-	enum status_code rc;
-	
-	if((rc =COMP_GetReading_Byte(COMP_OP_MODE,&mode)) != STATUS_OK){
-		return rc;
-	}
-	
-	switch(mode)
-	{
-	case 	
-	}
-	
-	return rc;
-	
-};
-*/
-
