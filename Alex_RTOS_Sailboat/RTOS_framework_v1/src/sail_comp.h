@@ -8,9 +8,17 @@
 #define SRC_SAIL_COMP_H_
 
 #include <status_codes.h>
+#include <FreeRTOS.h>
+#include <queue.h>
 
 #include "sail_types.h"
-	
+
+#define COMP_EVENT_BIT_OP 0x10
+
+
+
+QueueHandle_t queue_compass;
+
 // COMP_Init
 // Turn on compass and initialize driver
 // Status: 

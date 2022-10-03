@@ -18,9 +18,9 @@
 #include "sail_buffer.h"
 #include "sail_debug.h"
 
-#define UART_RX_BUFFER_LENGTH		1024
+#define UART_RX_BUFFER_LENGTH		256
 //#define UART_RX_BUFFER_LENGTH		256
-#define UART_TX_BUFFER_LENGTH		1024
+#define UART_TX_BUFFER_LENGTH		256
 
 // Buffers to hold receive and transmit data
 static volatile uint8_t rx_buffers[UART_NUM_CHANNELS][UART_RX_BUFFER_LENGTH];
@@ -39,42 +39,31 @@ static struct usart_module uart_modules[UART_NUM_CHANNELS];
 
 
 static uint32_t baud_rates[] = {
-	9600,
-	4800,
-	9600,
-	57600
+	9600,	// GPS
+	4800,	// WIND
+	9600,	// RADIO
+	57600	// XEOS
 };
 
-/*
-UART_ChannelIDs:
-	UART_GPS,
-	UART_WEATHERSTATION,
-	UART_RADIO,
-	UART_XEOS,
-	UART_NUM_CHANNELS
-*/
-
-
-
 static enum usart_signal_mux_settings mux_settings[] = {
-	USART_RX_1_TX_0_XCK_1,
-	USART_RX_1_TX_0_XCK_1,
-	USART_RX_1_TX_0_XCK_1,
-	USART_RX_3_TX_2_XCK_3
+	USART_RX_1_TX_0_XCK_1,	// GPS
+	USART_RX_1_TX_0_XCK_1,	// WIND
+	USART_RX_1_TX_0_XCK_1,	// RADIO 
+	USART_RX_3_TX_2_XCK_3,  // XEOS
 };
 
 static uint32_t pinmux_pads[][UART_NUM_CHANNELS] = {
 	{PINMUX_PA04D_SERCOM0_PAD0, PINMUX_PA05D_SERCOM0_PAD1, PINMUX_UNUSED, PINMUX_UNUSED},
 	{PINMUX_PB08D_SERCOM4_PAD0, PINMUX_PB09D_SERCOM4_PAD1, PINMUX_UNUSED, PINMUX_UNUSED},
-	{PINMUX_PB16C_SERCOM5_PAD0, PINMUX_PB17C_SERCOM5_PAD1, PINMUX_UNUSED, PINMUX_UNUSED},
+	{PINMUX_PB16C_SERCOM5_PAD0, PINMUX_PB17C_SERCOM5_PAD1, PINMUX_UNUSED, PINMUX_UNUSED},	
 	{PINMUX_UNUSED, PINMUX_UNUSED, PINMUX_PA24C_SERCOM3_PAD2, PINMUX_PA25C_SERCOM3_PAD3}
 };
 
 static Sercom *const sercom_ptrs[] = {
-	SERCOM0,
-	SERCOM4,
-	SERCOM5,
-	SERCOM3
+	SERCOM0, // GPS
+	SERCOM4, // WIND
+	SERCOM5, // RADIO
+	SERCOM3  // XEOS
 };
 
 // Receiver states
@@ -327,7 +316,7 @@ void GPS_RxCallback(struct usart_module *const usart_module) {
 }
 
 void WIND_RxCallback(struct usart_module *const usart_module) {
-	UART_RxCallback(UART_WEATHERSTATION);
+	UART_RxCallback(UART_WIND);
 }
 
 void RADIO_RxCallback(struct usart_module *const usart_module) {
@@ -345,7 +334,7 @@ void GPS_TxCallback(struct usart_module *const usart_module) {
 }
 
 void WIND_TxCallback(struct usart_module *const usart_module) {
-	UART_TxCallback(UART_WEATHERSTATION);
+	UART_TxCallback(UART_WIND);
 }
 
 void RADIO_TxCallback(struct usart_module *const usart_module) {

@@ -19,6 +19,7 @@
 #include "sail_nav.h"
 #include "sail_ctrl.h"
 #include "sail_radio.h"
+#include "sail_comp.h"
 
 void WatchDogTask(void);
 static void StartWatchDog(void);
@@ -26,9 +27,8 @@ static void KickWatchDog(void);
 
 enum all_tasks running_task;
 
-EventGroupHandle_t mode_event_group = NULL;
-SemaphoreHandle_t write_buffer_mutex[UART_NUM_CHANNELS];
-
+EventGroupHandle_t	mode_event_group = NULL;
+SemaphoreHandle_t	write_buffer_mutex[UART_NUM_CHANNELS];
 unsigned char watchdog_counter;
 unsigned char watchdog_reset_value = 0x3F;
 
@@ -36,39 +36,45 @@ enum status_code init_tasks(void) {
 	
 	// Initialize the mode event group
 	mode_event_group = xEventGroupCreate();
-	
 	// Initialize the mutexes for writing to the uart buffers
 	int i;
 	for(i = 0; i < UART_NUM_CHANNELS; i++){
 		write_buffer_mutex[i] = xSemaphoreCreateMutex();
 	}
+	// Initialize the queues
+	
+	if((queue_compass = xQueueCreate(4,sizeof(COMP_Reading))) == NULL){
+		DEBUG_Write_Unprotected("Failed to allocate Memory for Compass Queue");
+		return -1;	
+	} else{
+		DEBUG_Write_Unprotected("Compass Queue Good\n\r");
+	}
+	
 	
 	// Initialize the watchdog counter
 	watchdog_counter = 0;
 	
 	// Task for reading incoming data from the GPS
-	xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
+	//xTaskCreate( ReadGPS, NULL, GPS_STACK_SIZE, NULL, GPS_PRIORITY, NULL );	
 
 	// Task for reading incoming data from the weather station
-	//xTaskCreate( ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
-	
+	//xTaskCreate(ReadWeatherSensor, NULL, WEATHER_SENSOR_STACK_SIZE, NULL, WEATHER_SENSOR_PRIORITY, NULL );
 	// Task for updating the course of the sailboat
-	//xTaskCreate( UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE, NULL, UPDATE_COURSE_PRIORITY, NULL );
+	xTaskCreate(UpdateCourse, NULL, UPDATE_COURSE_STACK_SIZE + 100, NULL, UPDATE_COURSE_PRIORITY, NULL );
 	
 	// Task for changing the position of the rudder
-	//xTaskCreate( ControlRudder, NULL, CONTROL_RUDDER_STACK_SIZE, NULL, CONTROL_RUDDER_PRIORITY, NULL );
+	//xTaskCreate(ControlRudder, NULL, CONTROL_RUDDER_STACK_SIZE, NULL, CONTROL_RUDDER_PRIORITY, NULL );
 	
 	// Task for handling incoming messages to the radio
-	//xTaskCreate( RadioHandler, NULL, RADIO_HANDLER_STACK_SIZE, NULL, RADIO_HANDLER_PRIORITY, NULL );
+	//xTaskCreate(RadioHandler, NULL, RADIO_HANDLER_STACK_SIZE, NULL, RADIO_HANDLER_PRIORITY, NULL );
 	
 	// Task for transmitting logs using the radio
-	//xTaskCreate( LogData, NULL, LOG_DATA_STACK_SIZE, NULL, LOG_DATA_PRIORITY, NULL );
+	//xTaskCreate(LogData, NULL, LOG_DATA_STACK_SIZE, NULL, LOG_DATA_PRIORITY, NULL );
 	
 	// Task for getting the heading from the compass
-	//xTaskCreate( ReadCompass, NULL, READ_COMPASS_STACK_SIZE, NULL, READ_COMPASS_PRIORITY, NULL );
-	
+	xTaskCreate(ReadCompass, NULL, READ_COMPASS_STACK_SIZE + 1000, NULL, READ_COMPASS_PRIORITY, NULL );
 	// Task for reseting the watchdog so that the microcontroller is not restarted
-	xTaskCreate( WatchDogTask, NULL, WATCHDOG_STACK_SIZE, NULL, WATCHDOG_PRIORITY, NULL );
+	xTaskCreate(WatchDogTask, NULL, WATCHDOG_STACK_SIZE, NULL, WATCHDOG_PRIORITY, NULL );
 	
 	//pass control to FreeRTOS kernel
 	vTaskStartScheduler();
@@ -131,4 +137,13 @@ void vApplicationDaemonTaskStartupHook(void) {
 	//StartWatchDog();
 }
 
-
+/*
+void Update_Event_Bits(EventBits_t * mask)
+{
+	EventBits_t curr_mask = xEventGroupGetBits(mode_event_group);
+	
+	xEventGroupSetBits(mode_event_group,(curr_mask | mask));
+	
+	return;
+}
+*/

@@ -3,7 +3,6 @@
  * Created on June 27, 2016.
  * Created by Thomas Gwynne-Timothy.
  */
-
 #include "sail_debug.h"
 
 
@@ -55,10 +54,6 @@ enum status_code DEBUG_Write(const char *format, ...) {
 	// Send the string
 	// This prints to a serial terminal when the SAMD20 is powered by a laptop
 	UART_TxString(UART_XEOS, debug_buffer); 
-	//UART_TxString(UART_GPS, debug_buffer);
-	// This will print the debug statements over the Xbee radios
-	//UART_TxString(UART_RADIO, debug_buffer);
-	//UART_TxString(UART_WEATHERSTATION, debug_buffer);
 #endif	
 	
 	return STATUS_OK;
@@ -82,15 +77,6 @@ enum status_code DEBUG_Write_Unprotected(const char *format, ...) {
 	// Send the string
 	// This prints to a serial terminal when the SAMD20 is powered by a laptop
 	UART_TxString_Unprotected(UART_XEOS, debug_buffer);
-	//UART_TxString(UART_GPS, debug_buffer);
-	// This will print the debug statements over the Xbee radios
-	//UART_TxString(UART_RADIO, debug_buffer);
-	//UART_TxString(UART_WEATHERSTATION, debug_buffer);
 	#endif
-	
 	return STATUS_OK;
 }
-
-
-
-

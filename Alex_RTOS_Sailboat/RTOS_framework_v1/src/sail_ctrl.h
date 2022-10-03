@@ -7,8 +7,6 @@
 #include "FreeRTOSConfig.h"
 #include "task.h"
 
-
-
 #include <asf.h>
 #include <status_codes.h>
 #include "sail_radio.h"
@@ -22,8 +20,6 @@
 #define CONTROLRUDDER_ON_TIME_SEC 2
 #define CONTROLRUDDER_LOOP_LIM CONTROLRUDDER_ON_TIME_SEC * configTICK_RATE_HZ
 #define CONTROL_RUDDER_SLEEP_PERIOD_MS 1000
-
-#define READ_COMPASS_SLEEP_PERIOD_MS 500
 
 typedef enum Sensor_Types {
 	SENSOR_GPS,

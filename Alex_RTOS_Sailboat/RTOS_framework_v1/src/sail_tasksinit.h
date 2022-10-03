@@ -29,11 +29,13 @@ extern unsigned char watchdog_counter;
 // This changes depending on the tasks that are running in a specific mode
 extern unsigned char watchdog_reset_value;
 
+
 // The event bits for the mode event group
-#define CTRL_MODE_AUTO_BIT     (0x01UL)
-#define CTRL_MODE_REMOTE_BIT   (0x02UL)
-#define CTRL_MODE_LOAD_BIT     (0x04UL)
-#define CTRL_ALL_BITS          (0x07UL)
+/* Common Exclusive Bits */
+#define CTRL_MODE_AUTO_BIT		(0x001)
+#define CTRL_MODE_REMOTE_BIT	(0x002)
+#define CTRL_MODE_LOAD_BIT		(0x004)
+#define CTRL_ALL_BITS			(0x007)
 
 #define GPS_PRIORITY					  tskIDLE_PRIORITY + 3
 #define WEATHER_SENSOR_PRIORITY           tskIDLE_PRIORITY + 4
@@ -59,5 +61,6 @@ enum all_tasks { eReadWeatherSensor, eUpdateCourse, eControlRudder, eRadioHandle
 
 extern enum all_tasks running_task;
 
+void Update_Event_Bits(EventBits_t * mask);
 
 #endif

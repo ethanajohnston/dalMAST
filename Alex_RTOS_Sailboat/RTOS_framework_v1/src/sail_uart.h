@@ -12,14 +12,14 @@
 
 typedef enum UART_ChannelIDs {
 	UART_GPS,
-	UART_WEATHERSTATION,
+	UART_WIND,
 	UART_RADIO,
 	UART_XEOS,
 	UART_NUM_CHANNELS
 } UART_ChannelID;
 
 
-//UART_Init
+// UART_Init
 // Initialize a specific UART port.
 // Inputs:
 //   id - ID of the specified UART port

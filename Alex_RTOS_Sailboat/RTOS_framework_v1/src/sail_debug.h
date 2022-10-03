@@ -59,5 +59,4 @@ enum status_code DEBUG_Write(const char *format, ...) __attribute__ ((format (gn
  */
 enum status_code DEBUG_Write_Unprotected(const char *format, ...) __attribute__ ((format (gnu_printf, 1, 2)));
 
-
-#endif /* SAIL_NMEA_H_ */
+#endif 
